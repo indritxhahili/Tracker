@@ -1,15 +1,21 @@
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
 const express = require('express');
 const https = require('https');
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const app = express();
+
+app.set('trust proxy', true);
 
 const visits = [];
 
 app.get('/', (req, res) => {
 
-    https.get('https://ipwho.is/', (response) => {
+    const ip =
+        req.headers['x-forwarded-for']?.split(',')[0] ||
+        req.socket.remoteAddress;
+
+    https.get(`https://ipwhois.app/json/${ip}`, (response) => {
 
         let data = '';
 
@@ -21,15 +27,13 @@ app.get('/', (req, res) => {
 
             const location = JSON.parse(data);
 
-            console.log(location);
-
             const info = {
-                ip: location.ip || 'Unknown',
-                city: location.city || 'Unknown',
-                region: location.region || 'Unknown',
-                country: location.country || 'Unknown',
-                latitude: location.latitude || 'Unknown',
-                longitude: location.longitude || 'Unknown',
+                ip: ip,
+                city: location.city,
+                region: location.region,
+                country: location.country,
+                latitude: location.latitude,
+                longitude: location.longitude,
                 time: new Date()
             };
 
