@@ -1,3 +1,15 @@
+const express = require('express');
+const https = require('https');
+
+const app = express();
+
+app.use(express.json());
+
+app.set('trust proxy', true);
+
+const visits = [];
+
+// MAIN PAGE
 app.get('/', (req, res) => {
 
     const ip =
@@ -52,5 +64,19 @@ app.get('/', (req, res) => {
         res.send('Error');
 
     });
+
+});
+
+// ADMIN PANEL
+app.get('/admin', (req, res) => {
+
+    res.json(visits);
+
+});
+
+// START SERVER
+app.listen(3000, () => {
+
+    console.log('Server running on port 3000');
 
 });
