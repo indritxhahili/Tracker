@@ -12,10 +12,10 @@ const visits = [];
 // MAIN PAGE
 app.get('/', (req, res) => {
 
-    const ip =
-        req.headers['x-forwarded-for'] ||
-        req.socket.remoteAddress;
-
+   const ip =
+    (req.headers['x-forwarded-for'] || '')
+    .split(',')[0]
+    .trim() || req.socket.remoteAddress;
     https.get(`https://ipwho.is/${ip}`, (response) => {
 
         let data = '';
